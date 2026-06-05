@@ -1,23 +1,46 @@
 pipeline {
     agent any
- 
+
+    tools {
+        maven 'Maven'
+        jdk 'JDK17'
+    }
+
     stages {
-        stage('Build') {
+        stage('Checkout') {
             steps {
-                echo 'Building the project...'
+                checkout scm
             }
         }
- 
-        stage('Test') {
+
+        stage('Clean') {
             steps {
-                echo 'Running tests...'
+                sh 'mvn clean'
             }
         }
- 
-        stage('Deploy') {
+
+        stage('Compile') {
             steps {
-                echo 'Deploying application...'
+                sh 'mvn compile'
             }
+        }
+
+        stage('Run Test') {
+            steps {
+                sh 'mvn exec:java -Dexec.mainClass="SDET_Day21.LaunchDemoWebsite"'
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline execution completed'
+        }
+        success {
+            echo 'Build Successful'
+        }
+        failure {
+            echo 'Build Failed'
         }
     }
 }
